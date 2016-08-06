@@ -1,21 +1,8 @@
-module View exposing (makePage, DisplayThing (..))
+module View exposing (makePage, DisplayThing (..), Msg (..))
 
 import Html exposing (..)
 import Html.App as App
 import Html.Events exposing (..)
-import Random
-import Dict as D
-import List exposing (..)
-import Maybe as M
-import Debug exposing (..)
-import Keyboard as K
-import Time exposing (..)
-import Char exposing (..)
-import Platform.Sub as S
-import Task exposing (perform)
-import Time exposing (..)
-import Random exposing (generate, float)
-import Platform.Cmd as C
 import Html.Attributes exposing (..)
 
 type DisplayThing = Text String | Image String
