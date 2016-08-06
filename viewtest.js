@@ -8900,6 +8900,33 @@ var _elm_lang$keyboard$Keyboard$subMap = F2(
 	});
 _elm_lang$core$Native_Platform.effectManagers['Keyboard'] = {pkg: 'elm-lang/keyboard', init: _elm_lang$keyboard$Keyboard$init, onEffects: _elm_lang$keyboard$Keyboard$onEffects, onSelfMsg: _elm_lang$keyboard$Keyboard$onSelfMsg, tag: 'sub', subMap: _elm_lang$keyboard$Keyboard$subMap};
 
+var _user$project$View$makeCard = function (dt) {
+	var _p0 = dt;
+	if (_p0.ctor === 'Text') {
+		return _elm_lang$html$Html$text(_p0._0);
+	} else {
+		return A2(
+			_elm_lang$html$Html$img,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(_elm_lang$html$Html_Attributes$attribute, 'src', _p0._0)
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[]));
+	}
+};
+var _user$project$View$ht = function (x) {
+	return A2(
+		_elm_lang$html$Html_Attributes$attribute,
+		'style',
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'height:',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(x),
+				'%')));
+};
 var _user$project$View$Image = function (a) {
 	return {ctor: 'Image', _0: a};
 };
@@ -8913,180 +8940,209 @@ var _user$project$View$EnterPressed = {ctor: 'EnterPressed'};
 var _user$project$View$TextChanged = function (a) {
 	return {ctor: 'TextChanged', _0: a};
 };
-var _user$project$View$makePage = F4(
-	function (card1, card2, avg, speed) {
+var _user$project$View$makePage = F6(
+	function (card1, card2, avg, speed, cards, continuous) {
 		return A2(
-			_elm_lang$html$Html$table,
+			_elm_lang$html$Html$div,
 			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html_Attributes$class('center'),
-					A2(_elm_lang$html$Html_Attributes$attribute, 'style', 'width:100%')
-				]),
+				[]),
 			_elm_lang$core$Native_List.fromArray(
 				[
 					A2(
-					_elm_lang$html$Html$tr,
+					_elm_lang$html$Html$table,
 					_elm_lang$core$Native_List.fromArray(
-						[]),
+						[
+							_elm_lang$html$Html_Attributes$class('center'),
+							A2(_elm_lang$html$Html_Attributes$attribute, 'style', 'width:100%;height:100%;')
+						]),
 					_elm_lang$core$Native_List.fromArray(
 						[
 							A2(
-							_elm_lang$html$Html$td,
-							_elm_lang$core$Native_List.fromArray(
-								[]),
+							_elm_lang$html$Html$tr,
 							_elm_lang$core$Native_List.fromArray(
 								[
-									A2(
-									_elm_lang$html$Html$table,
-									_elm_lang$core$Native_List.fromArray(
-										[
-											A2(_elm_lang$html$Html_Attributes$attribute, 'style', 'width:100%;height:100%')
-										]),
-									_elm_lang$core$Native_List.fromArray(
-										[
-											A2(
-											_elm_lang$html$Html$tr,
-											_elm_lang$core$Native_List.fromArray(
-												[]),
-											_elm_lang$core$Native_List.fromArray(
-												[
-													A2(
-													_elm_lang$html$Html$td,
-													_elm_lang$core$Native_List.fromArray(
-														[
-															_elm_lang$html$Html_Attributes$class('index_card')
-														]),
-													_elm_lang$core$Native_List.fromArray(
-														[
-															_elm_lang$html$Html$text('1')
-														]))
-												])),
-											A2(
-											_elm_lang$html$Html$tr,
-											_elm_lang$core$Native_List.fromArray(
-												[]),
-											_elm_lang$core$Native_List.fromArray(
-												[
-													A2(
-													_elm_lang$html$Html$td,
-													_elm_lang$core$Native_List.fromArray(
-														[
-															_elm_lang$html$Html_Attributes$class('index_card')
-														]),
-													_elm_lang$core$Native_List.fromArray(
-														[
-															_elm_lang$html$Html$text('1')
-														]))
-												]))
-										]))
-								])),
-							A2(
-							_elm_lang$html$Html$td,
-							_elm_lang$core$Native_List.fromArray(
-								[]),
-							_elm_lang$core$Native_List.fromArray(
-								[
-									A2(
-									_elm_lang$html$Html$p,
-									_elm_lang$core$Native_List.fromArray(
-										[]),
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_elm_lang$html$Html$text('Average time:')
-										])),
-									A2(
-									_elm_lang$html$Html$p,
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_elm_lang$html$Html_Attributes$class('center')
-										]),
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_elm_lang$html$Html$text(
-											_elm_lang$core$Basics$toString(avg))
-										])),
-									A2(
-									_elm_lang$html$Html$p,
-									_elm_lang$core$Native_List.fromArray(
-										[]),
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_elm_lang$html$Html$text('Speed (per minute):')
-										])),
-									A2(
-									_elm_lang$html$Html$p,
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_elm_lang$html$Html_Attributes$class('center')
-										]),
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_elm_lang$html$Html$text(
-											_elm_lang$core$Basics$toString(speed))
-										])),
-									A2(
-									_elm_lang$html$Html$button,
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_elm_lang$html$Html_Events$onClick(_user$project$View$TopPressed)
-										]),
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_elm_lang$html$Html$text('top')
-										])),
-									A2(
-									_elm_lang$html$Html$br,
-									_elm_lang$core$Native_List.fromArray(
-										[]),
-									_elm_lang$core$Native_List.fromArray(
-										[])),
-									A2(
-									_elm_lang$html$Html$button,
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_elm_lang$html$Html_Events$onClick(_user$project$View$BottomPressed)
-										]),
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_elm_lang$html$Html$text('top')
-										]))
-								]))
-						])),
-					A2(
-					_elm_lang$html$Html$tr,
-					_elm_lang$core$Native_List.fromArray(
-						[]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							A2(
-							_elm_lang$html$Html$td,
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html_Attributes$colspan(2)
+									_user$project$View$ht(100)
 								]),
 							_elm_lang$core$Native_List.fromArray(
 								[
 									A2(
-									_elm_lang$html$Html$input,
+									_elm_lang$html$Html$td,
 									_elm_lang$core$Native_List.fromArray(
 										[
-											_elm_lang$html$Html_Events$onInput(_user$project$View$TextChanged),
-											A2(_elm_lang$html$Html_Attributes$attribute, 'style', 'width:100%')
+											A2(_elm_lang$html$Html_Attributes$attribute, 'style', 'width:80%;height:100%;')
 										]),
 									_elm_lang$core$Native_List.fromArray(
-										[]))
+										[
+											A2(
+											_elm_lang$html$Html$table,
+											_elm_lang$core$Native_List.fromArray(
+												[
+													A2(_elm_lang$html$Html_Attributes$attribute, 'style', 'width:100%;height:100%;')
+												]),
+											_elm_lang$core$Native_Utils.eq(cards, 1) ? _elm_lang$core$Native_List.fromArray(
+												[
+													A2(
+													_elm_lang$html$Html$tr,
+													_elm_lang$core$Native_List.fromArray(
+														[
+															_user$project$View$ht(100)
+														]),
+													_elm_lang$core$Native_List.fromArray(
+														[
+															A2(
+															_elm_lang$html$Html$td,
+															_elm_lang$core$Native_List.fromArray(
+																[
+																	_user$project$View$ht(100),
+																	_elm_lang$html$Html_Attributes$class('index_card')
+																]),
+															_elm_lang$core$Native_List.fromArray(
+																[
+																	_user$project$View$makeCard(card1)
+																]))
+														]))
+												]) : _elm_lang$core$Native_List.fromArray(
+												[
+													A2(
+													_elm_lang$html$Html$tr,
+													_elm_lang$core$Native_List.fromArray(
+														[
+															_user$project$View$ht(50)
+														]),
+													_elm_lang$core$Native_List.fromArray(
+														[
+															A2(
+															_elm_lang$html$Html$td,
+															_elm_lang$core$Native_List.fromArray(
+																[
+																	_user$project$View$ht(50),
+																	_elm_lang$html$Html_Attributes$class('index_card')
+																]),
+															_elm_lang$core$Native_List.fromArray(
+																[
+																	_user$project$View$makeCard(card1)
+																]))
+														])),
+													A2(
+													_elm_lang$html$Html$tr,
+													_elm_lang$core$Native_List.fromArray(
+														[
+															_user$project$View$ht(50)
+														]),
+													_elm_lang$core$Native_List.fromArray(
+														[
+															A2(
+															_elm_lang$html$Html$td,
+															_elm_lang$core$Native_List.fromArray(
+																[
+																	_user$project$View$ht(50),
+																	_elm_lang$html$Html_Attributes$class('index_card')
+																]),
+															_elm_lang$core$Native_List.fromArray(
+																[
+																	_user$project$View$makeCard(card2)
+																]))
+														]))
+												]))
+										])),
+									A2(
+									_elm_lang$html$Html$td,
+									_elm_lang$core$Native_List.fromArray(
+										[
+											_user$project$View$ht(100)
+										]),
+									_elm_lang$core$Native_List.fromArray(
+										[
+											A2(
+											_elm_lang$html$Html$p,
+											_elm_lang$core$Native_List.fromArray(
+												[]),
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html$text('Average time:')
+												])),
+											A2(
+											_elm_lang$html$Html$p,
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html_Attributes$class('center')
+												]),
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html$text(
+													_elm_lang$core$Basics$toString(avg))
+												])),
+											A2(
+											_elm_lang$html$Html$p,
+											_elm_lang$core$Native_List.fromArray(
+												[]),
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html$text('Speed (per minute):')
+												])),
+											A2(
+											_elm_lang$html$Html$p,
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html_Attributes$class('center')
+												]),
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html$text(
+													_elm_lang$core$Basics$toString(speed))
+												])),
+											A2(
+											_elm_lang$html$Html$button,
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html_Events$onClick(_user$project$View$TopPressed)
+												]),
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html$text(
+													_elm_lang$core$Native_Utils.eq(cards, 1) ? '1 card view' : '2 card view')
+												])),
+											A2(
+											_elm_lang$html$Html$br,
+											_elm_lang$core$Native_List.fromArray(
+												[]),
+											_elm_lang$core$Native_List.fromArray(
+												[])),
+											A2(
+											_elm_lang$html$Html$button,
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html_Events$onClick(_user$project$View$BottomPressed)
+												]),
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html$text(
+													continuous ? 'Continuous' : 'With pauses')
+												]))
+										]))
 								]))
-						]))
+						])),
+					A2(
+					_elm_lang$html$Html$input,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Events$onInput(_user$project$View$TextChanged),
+							A2(_elm_lang$html$Html_Attributes$attribute, 'style', 'width:100%')
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[]))
 				]));
 	});
 
 var _user$project$ViewTest$main = {
-	main: A4(
+	main: A6(
 		_user$project$View$makePage,
 		_user$project$View$Text('1'),
 		_user$project$View$Text('2'),
 		0,
-		0)
+		0,
+		2,
+		true)
 };
 
 var Elm = {};
