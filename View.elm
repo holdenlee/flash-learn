@@ -24,24 +24,21 @@ type Msg = TextChanged String | EnterPressed | TopPressed | BottomPressed | Save
 
 makePage : DisplayThing -> DisplayThing -> Float -> Float -> Html Msg
 makePage card1 card2 avg speed =
-  table [class "center", attribute "style" "width:100%"] --2x2, consisting of cards, side pane, text input
-      [tr [] --cards and side pane
-           [td [] --cards
-                [table [attribute "style" "width:100%;height:100%"
-                       ] -- attribute "border" "1" -- nested table for cards
-                    [tr [] [td [class "index_card"] [text "1"]],
-                     tr [] [td [class "index_card"] [text "1"]]]],
---                     [text "left"]],
-{-                     [col []
-                          [td [class "index_card"] [text "1"],
-                           td [class "index_card"] [text "2"]]]],-}
-            td [] --side panel
-                [p [] [text "Average time:"],
-                 p [class "center"] [text (toString avg)],
-                 p [] [text "Speed (per minute):"],
-                 p [class "center"] [text (toString speed)],
-                 button [onClick TopPressed] [text "top"],
-                 br [] [],
-                 button [onClick BottomPressed] [text "top"]]],
-                 --text "side"]],
-            tr [] [td [colspan 2] [input [onInput TextChanged, attribute "style" "width:100%"] []]]]
+    div [] 
+        [table [class "center", attribute "style" "width:100%"] --2x2, consisting of cards, side pane, text input
+             [tr [] --cards and side pane
+                  [td [] --cards
+                       [table [attribute "style" "width:100%;height:100%"
+                              ] -- attribute "border" "1" -- nested table for cards
+                            [tr [] [td [class "index_card"] [text "1"]],
+                             tr [] [td [class "index_card"] [text "1"]]]],
+         
+                   td [] --side panel
+                       [p [] [text "Average time:"],
+                        p [class "center"] [text (toString avg)],
+                        p [] [text "Speed (per minute):"],
+                        p [class "center"] [text (toString speed)],
+                        button [onClick TopPressed] [text "top"],
+                        br [] [],
+                        button [onClick BottomPressed] [text "top"]]]],
+          input [onInput TextChanged, attribute "style" "width:100%"] []]
