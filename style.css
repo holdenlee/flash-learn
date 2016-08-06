@@ -3,3 +3,14 @@
 body {
      font-family: "Verdana", Arial, sans-serif;
 /*color:#555*/}
+
+table, th, td {
+    /*border: 1px solid black;
+    border-collapse: collapse;*/
+    padding: 5px;
+    border-spacing: 5px
+}
+
+.index_card {
+    border: 1px solid black;
+}
