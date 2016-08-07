@@ -60,5 +60,6 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
   div []
-    [ h1 [] [ text (toString (S.toList model.keys)) ]
+    [ h1 [] [ text (toString (S.toList model.keys)) ],
+      input [] []
     ]

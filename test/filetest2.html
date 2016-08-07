@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+
+<body>
+<div id="filetest"></div>
+
+<input type='file' id='file-input' />
+
+<script src="filetest.js"></script>
+
+<script>
+  window.onload = function()
+  {
+    var node = document.getElementById('filetest');
+    var app = Elm.FileTest.embed(node);
+    function readSingleFile(e) {
+  var file = e.target.files[0];
+  if (!file) {
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var contents = e.target.result;
+    app.ports.receivedFile.send(contents);
+  };
+  reader.readAsText(file);
+}
+
+document.getElementById('file-input')
+  .addEventListener('change', readSingleFile, false);
+  }
+
+
+</script>
+</body>
+</html>

@@ -42,7 +42,11 @@ makePage card1 card2 txt avg speed cards continuous check =
                         br [] [],
                         makeButton continuous BottomPressed "Continuous" "With pauses",
                         br [] [] ,
-                        makeButton check CheckPressed "Quick-check" "Enter to submit"]]],
+                        makeButton check CheckPressed "Quick-check" "Enter to submit",
+                        br [] [],
+                        button [onClick Save] [text "Save"]
+                        --input [type' "file", id "file-input"] []
+                        ]]],
           input [onInput TextChanged, attribute "style" "width:100%", value txt] []]
 
 makeButton b action txt1 txt2 = 

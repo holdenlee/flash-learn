@@ -9481,7 +9481,23 @@ var _user$project$View$makePage = F8(
 												[]),
 											_elm_lang$core$Native_List.fromArray(
 												[])),
-											A4(_user$project$View$makeButton, check, _user$project$View$CheckPressed, 'Quick-check', 'Enter to submit')
+											A4(_user$project$View$makeButton, check, _user$project$View$CheckPressed, 'Quick-check', 'Enter to submit'),
+											A2(
+											_elm_lang$html$Html$br,
+											_elm_lang$core$Native_List.fromArray(
+												[]),
+											_elm_lang$core$Native_List.fromArray(
+												[])),
+											A2(
+											_elm_lang$html$Html$button,
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html_Events$onClick(_user$project$View$Save)
+												]),
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html$text('Save')
+												]))
 										]))
 								]))
 						])),
@@ -9498,6 +9514,8 @@ var _user$project$View$makePage = F8(
 				]));
 	});
 
+var _user$project$KeyCodes$pageDown = 34;
+var _user$project$KeyCodes$pageUp = 33;
 var _user$project$KeyCodes$esc = 27;
 var _user$project$KeyCodes$down = 40;
 var _user$project$KeyCodes$right = 39;
@@ -9506,14 +9524,80 @@ var _user$project$KeyCodes$up = 38;
 var _user$project$KeyCodes$space = 32;
 var _user$project$KeyCodes$enter = 13;
 
+var _user$project$FlashLearn$writeToJSON = function (m) {
+	return A2(
+		_elm_lang$core$Json_Encode$encode,
+		1,
+		_elm_lang$core$Json_Encode$list(
+			A2(
+				_elm_lang$core$List$map,
+				function (k) {
+					var c = A2(
+						_elm_lang$core$Maybe$withDefault,
+						A2(_user$project$FlashCards$flashCard, '', ''),
+						A2(_elm_lang$core$Dict$get, k, m.session.dict));
+					return _elm_lang$core$Json_Encode$object(
+						_elm_lang$core$Native_List.fromArray(
+							[
+								{
+								ctor: '_Tuple2',
+								_0: 'front',
+								_1: _elm_lang$core$Json_Encode$string(c.front)
+							},
+								{
+								ctor: '_Tuple2',
+								_0: 'back',
+								_1: _elm_lang$core$Json_Encode$string(c.back)
+							},
+								{
+								ctor: '_Tuple2',
+								_0: 'avg',
+								_1: _elm_lang$core$Json_Encode$float(
+									A2(
+										_elm_lang$core$Maybe$withDefault,
+										10,
+										A2(_elm_lang$core$Dict$get, k, m.session.progress)))
+							}
+							]));
+				},
+				_elm_lang$core$Dict$keys(m.session.dict))));
+};
+var _user$project$FlashLearn$init = {
+	ctor: '_Tuple2',
+	_0: {
+		session: _elm_lang$core$Basics$fst(_user$project$FlashCards$test),
+		settings: _user$project$View$defaultSettings,
+		running: false
+	},
+	_1: _elm_lang$core$Platform_Cmd$none
+};
 var _user$project$FlashLearn$whetherToReview = F2(
 	function (correct, m) {
 		return (_elm_lang$core$Basics$not(correct) && _elm_lang$core$Native_Utils.eq(m.settings.cards, 2)) || _elm_lang$core$Basics$not(m.settings.continuous);
 	});
-var _user$project$FlashLearn$Model = F2(
-	function (a, b) {
-		return {session: a, settings: b};
+var _user$project$FlashLearn$flashCardDecoder = A4(
+	_elm_lang$core$Json_Decode$object3,
+	F3(
+		function (x, y, z) {
+			return {front: x, back: y, avg: z};
+		}),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'front', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'back', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'avg', _elm_lang$core$Json_Decode$float));
+var _user$project$FlashLearn$receivedFile = _elm_lang$core$Native_Platform.incomingPort('receivedFile', _elm_lang$core$Json_Decode$string);
+var _user$project$FlashLearn$saveFile = _elm_lang$core$Native_Platform.outgoingPort(
+	'saveFile',
+	function (v) {
+		return v;
 	});
+var _user$project$FlashLearn$Model = F3(
+	function (a, b, c) {
+		return {session: a, settings: b, running: c};
+	});
+var _user$project$FlashLearn$SaveFile = {ctor: 'SaveFile'};
+var _user$project$FlashLearn$ReceivedFile = function (a) {
+	return {ctor: 'ReceivedFile', _0: a};
+};
 var _user$project$FlashLearn$Msgs = function (a) {
 	return {ctor: 'Msgs', _0: a};
 };
@@ -9550,94 +9634,168 @@ var _user$project$FlashLearn$finish = F2(
 	});
 var _user$project$FlashLearn$update = F2(
 	function (msg, m) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
-			case 'UserAction':
-				var _p2 = _p0._0;
-				var m$ = _elm_lang$core$Native_Utils.update(
-					m,
-					{
-						settings: A2(_user$project$View$updateSettings, _p2, m.settings)
-					});
-				var _p1 = _p2;
-				if (_p1.ctor === 'TextChanged') {
-					var s = m$.session;
-					var m$$ = _elm_lang$core$Native_Utils.update(
-						m$,
-						{
-							session: _elm_lang$core$Native_Utils.update(
-								s,
-								{curText: _p1._0})
-						});
-					return {
-						ctor: '_Tuple2',
-						_0: m$$,
-						_1: (m$$.settings.quickCheck && _user$project$FlashCards$check(m$$.session)) ? _user$project$Utilities$cmdReturn(
-							_user$project$FlashLearn$RequestTime(
-								_user$project$FlashLearn$finish(m$$))) : _elm_lang$core$Platform_Cmd$none
-					};
-				} else {
-					return {ctor: '_Tuple2', _0: m$, _1: _elm_lang$core$Platform_Cmd$none};
+		var _p0 = {ctor: '_Tuple2', _0: msg, _1: m.running};
+		_v0_5:
+		do {
+			if (_p0.ctor === '_Tuple2') {
+				switch (_p0._0.ctor) {
+					case 'UserAction':
+						var _p2 = _p0._0._0;
+						var m$ = _elm_lang$core$Native_Utils.update(
+							m,
+							{
+								settings: A2(_user$project$View$updateSettings, _p2, m.settings)
+							});
+						var _p1 = _p2;
+						switch (_p1.ctor) {
+							case 'TextChanged':
+								var s = m$.session;
+								var m$$ = _elm_lang$core$Native_Utils.update(
+									m$,
+									{
+										session: _elm_lang$core$Native_Utils.update(
+											s,
+											{curText: _p1._0})
+									});
+								return {
+									ctor: '_Tuple2',
+									_0: m$$,
+									_1: (m$$.settings.quickCheck && (_user$project$FlashCards$check(m$$.session) && m$$.running)) ? _user$project$Utilities$cmdReturn(
+										_user$project$FlashLearn$RequestTime(
+											_user$project$FlashLearn$finish(m$$))) : _elm_lang$core$Platform_Cmd$none
+								};
+							case 'Save':
+								return {
+									ctor: '_Tuple2',
+									_0: m$,
+									_1: _user$project$FlashLearn$saveFile(
+										_user$project$FlashLearn$writeToJSON(m$))
+								};
+							default:
+								return {ctor: '_Tuple2', _0: m$, _1: _elm_lang$core$Platform_Cmd$none};
+						}
+					case 'InternalAction':
+						if (_p0._1 === true) {
+							var _p3 = A2(_user$project$FlashCards$update, _p0._0._0, m.session);
+							var session$ = _p3._0;
+							var cmd = _p3._1;
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									m,
+									{session: session$}),
+								_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$FlashLearn$InternalAction, cmd)
+							};
+						} else {
+							break _v0_5;
+						}
+					case 'RequestTime':
+						if (_p0._1 === true) {
+							return {
+								ctor: '_Tuple2',
+								_0: m,
+								_1: A3(_elm_lang$core$Task$perform, _elm_lang$core$Basics$identity, _p0._0._0, _elm_lang$core$Time$now)
+							};
+						} else {
+							break _v0_5;
+						}
+					case 'Msgs':
+						return {
+							ctor: '_Tuple2',
+							_0: m,
+							_1: _elm_lang$core$Platform_Cmd$batch(
+								A2(_elm_lang$core$List$map, _user$project$Utilities$cmdReturn, _p0._0._0))
+						};
+					case 'ReceivedFile':
+						var _p4 = A2(
+							_elm_lang$core$Json_Decode$decodeString,
+							_elm_lang$core$Json_Decode$list(_user$project$FlashLearn$flashCardDecoder),
+							_p0._0._0);
+						if (_p4.ctor === 'Ok') {
+							var _p5 = _p4._0;
+							var s = m.session;
+							var dict = _elm_lang$core$Dict$fromList(
+								A2(
+									_elm_lang$core$List$map,
+									function (i) {
+										return {
+											ctor: '_Tuple2',
+											_0: i.front,
+											_1: {front: i.front, back: i.back}
+										};
+									},
+									_p5));
+							var progress = _elm_lang$core$Dict$fromList(
+								A2(
+									_elm_lang$core$List$map,
+									function (i) {
+										return {ctor: '_Tuple2', _0: i.front, _1: i.avg};
+									},
+									_p5));
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									m,
+									{
+										session: _elm_lang$core$Native_Utils.update(
+											s,
+											{progress: progress, dict: dict}),
+										running: true
+									}),
+								_1: _user$project$Utilities$cmdReturn(
+									_user$project$FlashLearn$InternalAction(_user$project$FlashCards$Init))
+							};
+						} else {
+							return {ctor: '_Tuple2', _0: m, _1: _elm_lang$core$Platform_Cmd$none};
+						}
+					default:
+						break _v0_5;
 				}
-			case 'InternalAction':
-				var _p3 = A2(_user$project$FlashCards$update, _p0._0, m.session);
-				var session$ = _p3._0;
-				var cmd = _p3._1;
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						m,
-						{session: session$}),
-					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$FlashLearn$InternalAction, cmd)
-				};
-			case 'RequestTime':
-				return {
-					ctor: '_Tuple2',
-					_0: m,
-					_1: A3(_elm_lang$core$Task$perform, _elm_lang$core$Basics$identity, _p0._0, _elm_lang$core$Time$now)
-				};
-			default:
-				return {
-					ctor: '_Tuple2',
-					_0: m,
-					_1: _elm_lang$core$Platform_Cmd$batch(
-						A2(_elm_lang$core$List$map, _user$project$Utilities$cmdReturn, _p0._0))
-				};
-		}
+			} else {
+				break _v0_5;
+			}
+		} while(false);
+		return {ctor: '_Tuple2', _0: m, _1: _elm_lang$core$Platform_Cmd$none};
 	});
-var _user$project$FlashLearn$delayFinish = function (_p4) {
+var _user$project$FlashLearn$delayFinish = function (_p6) {
 	return _user$project$FlashLearn$InternalAction(
-		_user$project$FlashCards$SetEndTime(_p4));
+		_user$project$FlashCards$SetEndTime(_p6));
 };
 var _user$project$FlashLearn$subscriptions = function (m) {
-	return _elm_lang$keyboard$Keyboard$presses(
-		function (kc) {
-			return _elm_lang$core$Native_Utils.eq(kc, _user$project$KeyCodes$enter) ? (m.session.reviewing ? ((!_elm_lang$core$Native_Utils.eq(m.session.endTime, 0)) ? _user$project$FlashLearn$Msgs(
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_user$project$FlashLearn$InternalAction(
-						A2(_user$project$FlashCards$Finished, m.session.endTime, true)),
-						_user$project$FlashLearn$InternalAction(_user$project$FlashCards$GetNext)
-					])) : _user$project$FlashLearn$InternalAction(_user$project$FlashCards$GetNext)) : _user$project$FlashLearn$RequestTime(
-				_user$project$FlashLearn$finish(m))) : ((_elm_lang$core$Native_Utils.eq(kc, _user$project$KeyCodes$down) && _elm_lang$core$Basics$not(m.session.reviewing)) ? _user$project$FlashLearn$RequestTime(_user$project$FlashLearn$delayFinish) : (_elm_lang$core$Native_Utils.eq(kc, _user$project$KeyCodes$up) ? _user$project$FlashLearn$InternalAction(_user$project$FlashCards$GetNext) : ((_elm_lang$core$Native_Utils.eq(kc, _user$project$KeyCodes$esc) && (m.session.reviewing && (!_elm_lang$core$Native_Utils.eq(m.session.endTime, 0)))) ? _user$project$FlashLearn$Msgs(
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_user$project$FlashLearn$InternalAction(
-						A2(_user$project$FlashCards$Finished, m.session.endTime, false)),
-						_user$project$FlashLearn$InternalAction(_user$project$FlashCards$GetNext)
-					])) : _user$project$FlashLearn$Msgs(
-				_elm_lang$core$Native_List.fromArray(
-					[])))));
-		});
-};
-var _user$project$FlashLearn$init = {
-	ctor: '_Tuple2',
-	_0: {
-		session: _elm_lang$core$Basics$fst(_user$project$FlashCards$test),
-		settings: _user$project$View$defaultSettings
-	},
-	_1: _user$project$Utilities$cmdReturn(
-		_user$project$FlashLearn$InternalAction(_user$project$FlashCards$Init))
+	return _elm_lang$core$Platform_Sub$batch(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$keyboard$Keyboard$presses(
+				function (kc) {
+					return _elm_lang$core$Native_Utils.eq(kc, _user$project$KeyCodes$enter) ? (m.session.reviewing ? ((!_elm_lang$core$Native_Utils.eq(m.session.endTime, 0)) ? _user$project$FlashLearn$Msgs(
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_user$project$FlashLearn$InternalAction(
+								A2(_user$project$FlashCards$Finished, m.session.endTime, true)),
+								_user$project$FlashLearn$InternalAction(_user$project$FlashCards$GetNext)
+							])) : _user$project$FlashLearn$InternalAction(_user$project$FlashCards$GetNext)) : _user$project$FlashLearn$RequestTime(
+						_user$project$FlashLearn$finish(m))) : ((_elm_lang$core$Native_Utils.eq(kc, _user$project$KeyCodes$down) && _elm_lang$core$Basics$not(m.session.reviewing)) ? _user$project$FlashLearn$Msgs(
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_user$project$FlashLearn$RequestTime(_user$project$FlashLearn$delayFinish),
+								_user$project$FlashLearn$InternalAction(
+								_user$project$FlashCards$SetReview(true))
+							])) : (_elm_lang$core$Native_Utils.eq(kc, _user$project$KeyCodes$up) ? _user$project$FlashLearn$RequestTime(
+						function (_p7) {
+							return _user$project$FlashLearn$InternalAction(
+								_user$project$FlashCards$SetStartTime(_p7));
+						}) : ((_elm_lang$core$Native_Utils.eq(kc, _user$project$KeyCodes$esc) && (m.session.reviewing && (!_elm_lang$core$Native_Utils.eq(m.session.endTime, 0)))) ? _user$project$FlashLearn$Msgs(
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_user$project$FlashLearn$InternalAction(
+								A2(_user$project$FlashCards$Finished, m.session.endTime, false)),
+								_user$project$FlashLearn$InternalAction(_user$project$FlashCards$GetNext)
+							])) : _user$project$FlashLearn$Msgs(
+						_elm_lang$core$Native_List.fromArray(
+							[])))));
+				}),
+				_user$project$FlashLearn$receivedFile(_user$project$FlashLearn$ReceivedFile)
+			]));
 };
 var _user$project$FlashLearn$UserAction = function (a) {
 	return {ctor: 'UserAction', _0: a};

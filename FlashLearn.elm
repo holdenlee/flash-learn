@@ -1,4 +1,4 @@
-module FlashLearn exposing (..)
+port module FlashLearn exposing (..)
 
 import Html exposing (..)
 import Html.App as App
@@ -14,9 +14,11 @@ import Char exposing (..)
 import Platform.Sub as S
 import Task exposing (perform)
 import Time exposing (..)
-import Random exposing (generate, float)
 import Platform.Cmd as C
 import Html.Attributes exposing (class)
+import Result as R
+import Json.Decode exposing (decodeString, list, object3, (:=), string, Decoder, float)
+import Json.Encode as En
 
 import Utilities exposing (..) 
 import FlashCards as FC
@@ -26,19 +28,26 @@ import KeyCodes exposing (..)
 --MODEL
 
 type alias Model = {session : FC.Session FC.BasicFlashCard,
-                    settings : V.Settings
+                    settings : V.Settings,
+                    running : Bool
                    }
 
 type Msg = UserAction V.Msg 
          | InternalAction FC.Msg 
          | RequestTime (Time -> Msg) 
          | Msgs (List Msg)
+         | ReceivedFile String
+         | SaveFile
+
+port receivedFile : (String -> msg) -> Sub msg
+
+port saveFile : String -> Cmd msg
 
 --UPDATE
 update : Msg -> Model -> (Model, C.Cmd Msg)
 update msg m = 
-    case msg of
-        UserAction userMsg ->
+    case (msg, m.running) of
+        (UserAction userMsg, _) ->
             let
                 m' = {m | settings = V.updateSettings userMsg m.settings}
             in
@@ -50,21 +59,37 @@ update msg m =
 --https://groups.google.com/forum/#!topic/elm-discuss/JeelOj2d00w
 --https://groups.google.com/forum/#!topic/elm-discuss/CH77QbLmSTk
                         in (m'', 
-                             if m''.settings.quickCheck && FC.check m''.session
+                             if m''.settings.quickCheck && FC.check m''.session && m''.running
                              then
                                  cmdReturn <| RequestTime (finish m'')
                              else C.none)
-                    _ ->(m', C.none)
-        InternalAction intMsg -> 
+                    V.Save -> (m', saveFile (writeToJSON m'))
+                    _ -> (m', C.none)
+        (InternalAction intMsg, True) -> 
             let
                 (session', cmd) = FC.update intMsg m.session
             in
                 ({m | session = session'}, C.map InternalAction cmd)
-        RequestTime f -> (m, perform identity f now)
-        Msgs msgs -> (m, C.batch <| map cmdReturn msgs)
-{-
-V.TextChanged String | EnterPressed | TopPressed | BottomPressed | Save
--}
+        (RequestTime f, True) -> (m, perform identity f now)
+        (Msgs msgs, _) -> (m, C.batch <| map cmdReturn msgs)
+        (ReceivedFile file, _) -> 
+            case decodeString (list flashCardDecoder) file of
+                Ok li ->
+                    let
+                        progress = D.fromList <| map (\i -> (i.front, i.avg)) li
+                        dict = D.fromList <| map (\i -> (i.front, {front = i.front, back = i.back})) li
+                        s = m.session
+                    in
+                        ({m | session = {s | progress = progress, dict = dict}, running = True}, cmdReturn <| InternalAction FC.Init) 
+                Err x -> (m, C.none) --TODO: notify of failure.
+        _ -> (m, C.none)
+
+flashCardDecoder : Decoder {front : String, back : String, avg : Float}
+flashCardDecoder =
+    object3 (\x y z -> {front = x, back = y, avg = z})
+      ("front" := string)
+      ("back" := string)
+      ("avg" := float)
 
 {- input: whether to go into review mode -}
 finish' : Bool -> Bool -> Time -> Msg
@@ -89,8 +114,9 @@ whetherToReview correct m =  (((not correct)) && (m.settings.cards==2)) || (not 
 
 subscriptions : Model -> S.Sub Msg
 subscriptions m = 
-    K.presses (\kc -> 
-                 if kc == right --enter --continue
+  S.batch
+    [K.presses (\kc -> 
+                 if kc == enter --continue
                  then
                      if m.session.reviewing --if reviewing
                      then
@@ -99,20 +125,25 @@ subscriptions m =
                          else InternalAction FC.GetNext --get next card
                      else
                          RequestTime (finish m) -- request time and then finish
-                 else if kc == down && not m.session.reviewing --flip card
-                 then RequestTime delayFinish
-                 else if kc == up -- ignore card
-                 then InternalAction FC.GetNext
+                 else if (kc == down) && not m.session.reviewing --flip card
+                 then Msgs [RequestTime delayFinish, InternalAction <| FC.SetReview True]
+                 else if kc == up -- ignore card 
+                 then RequestTime (InternalAction << FC.SetStartTime)
                  else if kc == esc && m.session.reviewing && m.session.endTime/=0 --manually mark answer as wrong
                  then Msgs [InternalAction (FC.Finished m.session.endTime False), InternalAction FC.GetNext]
-                 else Msgs [])
+                 else Msgs []),
+--why don't arrow keys, esc, work?
+    receivedFile ReceivedFile]
 
 -- INIT
 
 init : (Model, Cmd Msg)
 init = ({session = fst (FC.test),
-         settings = V.defaultSettings}, 
-        cmdReturn <| InternalAction FC.Init)
+         settings = V.defaultSettings,
+         running = False
+        },
+        C.none)
+        --cmdReturn <| InternalAction FC.Init)
 
 --VIEW
 
@@ -134,3 +165,14 @@ main =
     , update = update
     , subscriptions = subscriptions
     }
+
+--need more work...
+writeToJSON : Model -> String
+writeToJSON m = 
+    En.encode 1 <| En.list <| 
+        map 
+        (\k -> let 
+                 c = M.withDefault (FC.flashCard "" "") <| D.get k m.session.dict 
+               in 
+                   En.object [("front", En.string c.front), ("back", En.string c.back), ("avg", En.float <|  M.withDefault 10 <| D.get k m.session.progress)]) 
+        (D.keys m.session.dict) 

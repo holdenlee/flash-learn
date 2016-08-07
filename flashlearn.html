@@ -5,15 +5,48 @@
 </head>
 
 <body>
+
+<input type='file' id='file-input' />
 <div id="flashlearn"></div>
 <script src="flashlearn.js"></script>
 
+<script src="FileSaver.js"></script>
+
 <script>
-  window.onload = function()
-  {
+window.onload = function()
+{
     var node = document.getElementById('flashlearn');
     var app = Elm.FlashLearn.embed(node);
-  }
+    function readSingleFile(e) {
+        var file = e.target.files[0];
+        if (!file) {
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var contents = e.target.result;
+            app.ports.receivedFile.send(contents);
+        };
+        reader.readAsText(file);
+    }
+
+    document.getElementById('file-input')
+        .addEventListener('change', readSingleFile, false);
+
+    function data2blob(data,isBase64)
+    {
+        var chars="";
+        if (isBase64) chars=atob(data); else chars=data;
+        var bytes=new Array(chars.length);
+        for (var i=0;i<chars.length; i++) bytes[i]=chars.charCodeAt(i);
+        var blob=new Blob([new Uint8Array(bytes)]);
+        return blob;
+    }
+
+    app.ports.saveFile.subscribe(function(str) {
+        saveAs( data2blob(str), "cards.json" );
+    });
+}
 </script>
 </body>
 </html>

@@ -7,3 +7,5 @@ left = 37
 right = 39
 down = 40
 esc = 27
+pageUp = 33
+pageDown = 34

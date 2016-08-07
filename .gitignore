@@ -26,6 +26,7 @@
 *.db
 *~
 *#
+test2.json
 
 # Folders #
 ###########
