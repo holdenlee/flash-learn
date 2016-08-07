@@ -9491,7 +9491,7 @@ var _user$project$View$makePage = F8(
 						[
 							_elm_lang$html$Html_Events$onInput(_user$project$View$TextChanged),
 							A2(_elm_lang$html$Html_Attributes$attribute, 'style', 'width:100%'),
-							A2(_elm_lang$html$Html_Attributes$attribute, 'value', txt)
+							_elm_lang$html$Html_Attributes$value(txt)
 						]),
 					_elm_lang$core$Native_List.fromArray(
 						[]))
@@ -9508,7 +9508,7 @@ var _user$project$KeyCodes$enter = 13;
 
 var _user$project$FlashLearn$whetherToReview = F2(
 	function (correct, m) {
-		return _elm_lang$core$Basics$not(correct) && _elm_lang$core$Native_Utils.eq(m.settings.cards, 2);
+		return (_elm_lang$core$Basics$not(correct) && _elm_lang$core$Native_Utils.eq(m.settings.cards, 2)) || _elm_lang$core$Basics$not(m.settings.continuous);
 	});
 var _user$project$FlashLearn$Model = F2(
 	function (a, b) {

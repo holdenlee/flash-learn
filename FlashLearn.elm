@@ -82,7 +82,7 @@ delayFinish : Time -> Msg
 delayFinish = InternalAction << FC.SetEndTime
 
 whetherToReview : Bool -> Model -> Bool
-whetherToReview correct m =  (((not correct)) && (m.settings.cards==2))
+whetherToReview correct m =  (((not correct)) && (m.settings.cards==2)) || (not m.settings.continuous)
 -- || (not m.settings.quickCheck)
 
 --SUBSCRIPTIONS
