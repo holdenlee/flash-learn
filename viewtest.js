@@ -7860,16 +7860,55 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$View$updateSettings = F2(
+	function (msg, m) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'TopPressed':
+				return _elm_lang$core$Native_Utils.update(
+					m,
+					{cards: 3 - m.cards});
+			case 'BottomPressed':
+				return _elm_lang$core$Native_Utils.update(
+					m,
+					{
+						continuous: _elm_lang$core$Basics$not(m.continuous)
+					});
+			case 'CheckPressed':
+				return _elm_lang$core$Native_Utils.update(
+					m,
+					{
+						quickCheck: _elm_lang$core$Basics$not(m.quickCheck)
+					});
+			default:
+				return m;
+		}
+	});
+var _user$project$View$defaultSettings = {cards: 1, continuous: true, quickCheck: true};
+var _user$project$View$makeButton = F4(
+	function (b, action, txt1, txt2) {
+		return A2(
+			_elm_lang$html$Html$button,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Events$onClick(action)
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text(
+					b ? txt1 : txt2)
+				]));
+	});
 var _user$project$View$makeCard = function (dt) {
-	var _p0 = dt;
-	if (_p0.ctor === 'Text') {
-		return _elm_lang$html$Html$text(_p0._0);
+	var _p1 = dt;
+	if (_p1.ctor === 'Text') {
+		return _elm_lang$html$Html$text(_p1._0);
 	} else {
 		return A2(
 			_elm_lang$html$Html$img,
 			_elm_lang$core$Native_List.fromArray(
 				[
-					A2(_elm_lang$html$Html_Attributes$attribute, 'src', _p0._0)
+					A2(_elm_lang$html$Html_Attributes$attribute, 'src', _p1._0)
 				]),
 			_elm_lang$core$Native_List.fromArray(
 				[]));
@@ -7887,6 +7926,10 @@ var _user$project$View$ht = function (x) {
 				_elm_lang$core$Basics$toString(x),
 				'%')));
 };
+var _user$project$View$Settings = F3(
+	function (a, b, c) {
+		return {cards: a, continuous: b, quickCheck: c};
+	});
 var _user$project$View$Image = function (a) {
 	return {ctor: 'Image', _0: a};
 };
@@ -7894,14 +7937,15 @@ var _user$project$View$Text = function (a) {
 	return {ctor: 'Text', _0: a};
 };
 var _user$project$View$Save = {ctor: 'Save'};
+var _user$project$View$CheckPressed = {ctor: 'CheckPressed'};
 var _user$project$View$BottomPressed = {ctor: 'BottomPressed'};
 var _user$project$View$TopPressed = {ctor: 'TopPressed'};
 var _user$project$View$EnterPressed = {ctor: 'EnterPressed'};
 var _user$project$View$TextChanged = function (a) {
 	return {ctor: 'TextChanged', _0: a};
 };
-var _user$project$View$makePage = F6(
-	function (card1, card2, avg, speed, cards, continuous) {
+var _user$project$View$makePage = F8(
+	function (card1, card2, txt, avg, speed, cards, continuous, check) {
 		return A2(
 			_elm_lang$html$Html$div,
 			_elm_lang$core$Native_List.fromArray(
@@ -8051,34 +8095,26 @@ var _user$project$View$makePage = F6(
 													_elm_lang$html$Html$text(
 													_elm_lang$core$Basics$toString(speed))
 												])),
-											A2(
-											_elm_lang$html$Html$button,
-											_elm_lang$core$Native_List.fromArray(
-												[
-													_elm_lang$html$Html_Events$onClick(_user$project$View$TopPressed)
-												]),
-											_elm_lang$core$Native_List.fromArray(
-												[
-													_elm_lang$html$Html$text(
-													_elm_lang$core$Native_Utils.eq(cards, 1) ? '1 card view' : '2 card view')
-												])),
+											A4(
+											_user$project$View$makeButton,
+											_elm_lang$core$Native_Utils.eq(cards, 1),
+											_user$project$View$TopPressed,
+											'1 card view',
+											'2 card view'),
 											A2(
 											_elm_lang$html$Html$br,
 											_elm_lang$core$Native_List.fromArray(
 												[]),
 											_elm_lang$core$Native_List.fromArray(
 												[])),
+											A4(_user$project$View$makeButton, continuous, _user$project$View$BottomPressed, 'Continuous', 'With pauses'),
 											A2(
-											_elm_lang$html$Html$button,
+											_elm_lang$html$Html$br,
 											_elm_lang$core$Native_List.fromArray(
-												[
-													_elm_lang$html$Html_Events$onClick(_user$project$View$BottomPressed)
-												]),
+												[]),
 											_elm_lang$core$Native_List.fromArray(
-												[
-													_elm_lang$html$Html$text(
-													continuous ? 'Continuous' : 'With pauses')
-												]))
+												[])),
+											A4(_user$project$View$makeButton, check, _user$project$View$CheckPressed, 'Quick-check', 'Enter to submit')
 										]))
 								]))
 						])),
@@ -8087,50 +8123,30 @@ var _user$project$View$makePage = F6(
 					_elm_lang$core$Native_List.fromArray(
 						[
 							_elm_lang$html$Html_Events$onInput(_user$project$View$TextChanged),
-							A2(_elm_lang$html$Html_Attributes$attribute, 'style', 'width:100%')
+							A2(_elm_lang$html$Html_Attributes$attribute, 'style', 'width:100%'),
+							A2(_elm_lang$html$Html_Attributes$attribute, 'value', txt)
 						]),
 					_elm_lang$core$Native_List.fromArray(
 						[]))
 				]));
 	});
 
-var _user$project$ViewTest$update = F2(
-	function (msg, m) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
-			case 'TopPressed':
-				return _elm_lang$core$Native_Utils.update(
-					m,
-					{cards: 3 - m.cards});
-			case 'BottomPressed':
-				return _elm_lang$core$Native_Utils.update(
-					m,
-					{
-						continuous: _elm_lang$core$Basics$not(m.continuous)
-					});
-			default:
-				return m;
-		}
-	});
 var _user$project$ViewTest$view = function (m) {
-	return A6(
+	return A8(
 		_user$project$View$makePage,
 		_user$project$View$Text('1'),
 		_user$project$View$Text('2'),
+		'',
 		0,
 		0,
 		m.cards,
-		m.continuous);
+		m.continuous,
+		m.quickCheck);
 };
-var _user$project$ViewTest$model = {cards: 1, continuous: true};
 var _user$project$ViewTest$main = {
 	main: _elm_lang$html$Html_App$beginnerProgram(
-		{model: _user$project$ViewTest$model, view: _user$project$ViewTest$view, update: _user$project$ViewTest$update})
+		{model: _user$project$View$defaultSettings, view: _user$project$ViewTest$view, update: _user$project$View$updateSettings})
 };
-var _user$project$ViewTest$Settings = F2(
-	function (a, b) {
-		return {cards: a, continuous: b};
-	});
 
 var Elm = {};
 Elm['ViewTest'] = Elm['ViewTest'] || {};

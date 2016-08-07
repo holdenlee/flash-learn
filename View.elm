@@ -1,4 +1,4 @@
-module View exposing (makePage, DisplayThing (..), Msg (..))
+module View exposing (makePage, DisplayThing (..), Msg (..), defaultSettings, updateSettings)
 
 import Html exposing (..)
 import Html.App as App
@@ -7,7 +7,7 @@ import Html.Attributes exposing (..)
 
 type DisplayThing = Text String | Image String
 
-type Msg = TextChanged String | EnterPressed | TopPressed | BottomPressed | Save
+type Msg = TextChanged String | EnterPressed | TopPressed | BottomPressed | CheckPressed | Save
 
 ht x = attribute "style" ("height:" ++ (toString x) ++ "%")
 
@@ -17,8 +17,8 @@ makeCard dt =
         Text str -> text str
         Image url -> img [attribute "src" url] []
 
-makePage : DisplayThing -> DisplayThing -> Float -> Float -> Int -> Bool -> Html Msg
-makePage card1 card2 avg speed cards continuous=
+makePage : DisplayThing -> DisplayThing -> String -> Float -> Float -> Int -> Bool -> Bool -> Html Msg
+makePage card1 card2 txt avg speed cards continuous check =
     div [] 
         [table [class "center", attribute "style" "width:100%;height:100%;"] --2x2, consisting of cards, side pane, text input
              --http://stackoverflow.com/questions/6654262/100-height-nested-table-in-standards-mode
@@ -38,7 +38,25 @@ makePage card1 card2 avg speed cards continuous=
                         p [class "center"] [text (toString avg)],
                         p [] [text "Speed (per minute):"],
                         p [class "center"] [text (toString speed)],
-                        button [onClick TopPressed] [text <| if cards==1 then "1 card view" else "2 card view"],
+                        makeButton (cards==1) TopPressed "1 card view" "2 card view",
                         br [] [],
-                        button [onClick BottomPressed] [text <| if continuous then "Continuous" else "With pauses"]]]],
-          input [onInput TextChanged, attribute "style" "width:100%"] []]
+                        makeButton continuous BottomPressed "Continuous" "With pauses",
+                        br [] [] ,
+                        makeButton check CheckPressed "Quick-check" "Enter to submit"]]],
+          input [onInput TextChanged, attribute "style" "width:100%", attribute "value" txt] []]
+
+makeButton b action txt1 txt2 = 
+    button [onClick action] [text <| if b then txt1 else txt2]
+
+type alias Settings = 
+    {cards : Int,
+     continuous : Bool,
+     quickCheck : Bool}
+
+defaultSettings = {cards=1, continuous=True, quickCheck = True}
+
+updateSettings msg m = case msg of
+                   TopPressed -> {m | cards = 3-m.cards}
+                   BottomPressed -> {m | continuous = not m.continuous}
+                   CheckPressed -> {m | quickCheck = not m.quickCheck}
+                   _ -> m
