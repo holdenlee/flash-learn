@@ -90,7 +90,7 @@ whetherToReview correct m =  (((not correct)) && (m.settings.cards==2)) || (not 
 subscriptions : Model -> S.Sub Msg
 subscriptions m = 
     K.presses (\kc -> 
-                 if kc == enter --continue
+                 if kc == right --enter --continue
                  then
                      if m.session.reviewing --if reviewing
                      then
