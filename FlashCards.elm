@@ -47,54 +47,89 @@ type alias Session a =
       current : String,
       step : Int,
       avgFunc : Float -> Float -> Float,
-      lastTime : Time
+      startTime : Time,
+      endTime : Time,
+      curText : String,
+      avgTime : Maybe Float,
+      reviewing : Bool
     }
 --add pause functionality.
 
 type Msg 
   = Finished Time Bool --finish time, and success/failure
-  | GetFinishTime Bool
   | Init
+  | GetNext
   | SetStartTime Time
-  | DoNothing
-  | Next (Maybe String)
+  | SetEndTime Time
+  | Next String
+  | SetReview Bool
+--(Time -> (Model, Cmd) -> Model) --this is a callback
 
-getCurrentCard : Session a -> M.Maybe a
-getCurrentCard  m = D.get m.current m.dict
+getCurrentCard' : Session a -> M.Maybe a
+getCurrentCard'  m = D.get m.current m.dict
+
+getCurrentCard : Session BasicFlashCard -> BasicFlashCard
+getCurrentCard = M.withDefault (flashCard "" "") << getCurrentCard'
 
 --UPDATE
 
-modelPickNew : Session a -> D.Dict String Float -> Cmd (M.Maybe String)
-modelPickNew model p = pick (model.tempF (model.tempSchedule model.step)) p
+modelPickNew : Session a -> D.Dict String Float -> Cmd String
+modelPickNew model p = C.map (M.withDefault "") <| pick (model.tempF (model.tempSchedule model.step)) p
 
 update = update' (flashCard "" "")
 
 update' : a -> Msg -> Session a -> (Session a, Cmd Msg)
 update' def msg model =
   case msg of
-    Finished time bool -> 
+    Finished time correct -> 
         let
             --how to update the score for the current?
-            elapsed = if bool then Just ((time - model.lastTime) / second) else Nothing
+            elapsed = if correct then Just ((time - model.startTime) / second) else Nothing
             f = \x ->
                 model.avgFunc x <|
-                model.getScore (M.withDefault def <| getCurrentCard model) elapsed
+                model.getScore (M.withDefault def <| getCurrentCard' model) elapsed
             newProgress = D.update (model.current) (M.map f) model.progress
-            nextKey = modelPickNew model newProgress
         in
             ({ model | progress = newProgress,
                        step = model.step + 1,
-                       lastTime = time
-             }, C.map Next nextKey)
-    Next (Just nextKey) -> ({ model | current = nextKey}, Cmd.none)
-    Next Nothing -> (model, Cmd.none)
+                       startTime = time,
+                       avgTime = case (model.avgTime, elapsed) of
+                                     (Just t, Just delta) -> Just (model.avgFunc t delta)
+                                     (Nothing, e) -> e
+                                     (Just t, Nothing) -> Just t
+             }, C.none)
+    GetNext -> (model, C.map Next (modelPickNew model model.progress))
+    Next nextKey -> ({ model | current = nextKey, curText = ""}, cmdReturn <| SetReview False)
     Init -> (model, perform identity SetStartTime now)
-    GetFinishTime bool -> (model, perform identity (\t -> Finished t bool) now)
-    SetStartTime time -> ({ model | lastTime = time}, C.map Next (modelPickNew model model.progress))
-    DoNothing -> (model, Cmd.none)
+--    GetFinishTime bool -> (model, perform identity (\t -> Finished t bool) now)
+    SetStartTime time -> ({ model | startTime = time, endTime = 0}, C.map Next (modelPickNew model model.progress))
+    SetEndTime time -> ({ model | endTime = time}, C.none)
+    SetReview bool -> ({ model | reviewing = bool}, C.none)
 
 --MODEL
 
 type alias BasicFlashCard = { front : String, back : String}
 
 flashCard x y = {front=x, back=y}
+
+check : Session BasicFlashCard -> Bool
+check m = m.curText == (getCurrentCard m).back
+
+--INIT
+
+test = ({ progress = D.fromList [("1", 10), ("2", 10)],
+         dict = D.fromList [("1", flashCard "1f" "1b"), ("2", flashCard "2f" "2b")],
+         tempF = temperature,
+         tempSchedule = \n -> (if (n%5==0) then 0 else 5),
+         getScore = \card mTime -> case mTime of
+                                       Nothing -> 10 --max score
+                                       Just time -> min 5 time,
+         current = "",
+         step = 0,
+         avgFunc = updateMovingAvg 0.9,
+         startTime = 0,
+         endTime = 0,
+         curText = "",
+         avgTime = Nothing,
+         reviewing = False
+       }, perform identity SetStartTime now)

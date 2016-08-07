@@ -1,4 +1,4 @@
-module View exposing (makePage, DisplayThing (..), Msg (..), defaultSettings, updateSettings)
+module View exposing (makePage, DisplayThing (..), Msg (..), defaultSettings, updateSettings, Settings)
 
 import Html exposing (..)
 import Html.App as App
@@ -7,7 +7,7 @@ import Html.Attributes exposing (..)
 
 type DisplayThing = Text String | Image String
 
-type Msg = TextChanged String | EnterPressed | TopPressed | BottomPressed | CheckPressed | Save
+type Msg = TextChanged String | TopPressed | BottomPressed | CheckPressed | Save
 
 ht x = attribute "style" ("height:" ++ (toString x) ++ "%")
 
@@ -43,7 +43,7 @@ makePage card1 card2 txt avg speed cards continuous check =
                         makeButton continuous BottomPressed "Continuous" "With pauses",
                         br [] [] ,
                         makeButton check CheckPressed "Quick-check" "Enter to submit"]]],
-          input [onInput TextChanged, attribute "style" "width:100%", attribute "value" txt] []]
+          input [onInput TextChanged, attribute "style" "width:100%", value txt] []]
 
 makeButton b action txt1 txt2 = 
     button [onClick action] [text <| if b then txt1 else txt2]

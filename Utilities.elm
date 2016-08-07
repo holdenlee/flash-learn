@@ -2,6 +2,7 @@ module Utilities exposing (..)
 
 import List exposing (..)
 import Maybe as M
+import Task as T
 
 {-
 logShow : a -> a
@@ -23,3 +24,7 @@ dropWhile f li = case li of
                       then dropWhile f rest
                       else li
                    [] -> []
+
+--http://package.elm-lang.org/packages/shmookey/cmd-extra/1.0.0/Cmd-Extra
+cmdReturn : msg -> Cmd msg
+cmdReturn x = T.perform (always x) (identity) (T.succeed x)

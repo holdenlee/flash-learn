@@ -19,6 +19,8 @@ import Platform.Cmd as C
 import Html.Attributes exposing (class)
 import FlashCards exposing (..)
 
+import KeyCodes exposing (..) 
+
 type alias Model = Session BasicFlashCard
 
 --VIEW
@@ -33,24 +35,8 @@ view model =
 
 --INIT
 
-test = ({ progress = D.fromList [("1", 10), ("2", 10)],
-         dict = D.fromList [("1", flashCard "1f" "1b"), ("2", flashCard "2f" "2b")],
-         tempF = temperature,
-         tempSchedule = \n -> (if (n%5==0) then 0 else 5),
-         getScore = \card mTime -> case mTime of
-                                       Nothing -> 10 --max score
-                                       Just time -> min 5 time,
-         current = "",
-         step = 0,
-         avgFunc = updateMovingAvg 0.9,
-         lastTime = 0
-       }, perform identity SetStartTime now)
 
 -- SUBSCRIPTIONS
-
-enter = 13
-space = 32
-
 subscriptions : Model -> Sub Msg
 subscriptions model =
     K.downs (\x -> 

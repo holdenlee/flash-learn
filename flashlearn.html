@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+<div id="flashlearn"></div>
+<script src="flashlearn.js"></script>
+
+<script>
+  window.onload = function()
+  {
+    var node = document.getElementById('flashlearn');
+    var app = Elm.FlashLearn.embed(node);
+  }
+</script>
+</body>
+</html>
